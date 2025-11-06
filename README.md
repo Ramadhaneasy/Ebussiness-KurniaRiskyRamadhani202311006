@@ -1,67 +1,57 @@
-📝 Dokumentasi Tugas Laravel Ebusiness
+# 📝 Dokumentasi Tugas Laravel Ebusiness (RBAC)
 
-Proyek ini mendokumentasikan implementasi sistem otorisasi berbasis peran (Role-Based Access Control / RBAC) pada aplikasi Laravel, sesuai dengan langkah-langkah yang ditentukan.
+Proyek ini mendokumentasikan implementasi sistem otorisasi berbasis peran (**Role-Based Access Control / RBAC**) pada aplikasi Laravel, sesuai dengan langkah-langkah tugas.
 
-✅ Implementasi Role-Based Access Control (RBAC)
+## ✅ Implementasi Role-Based Access Control (RBAC)
 
 Berikut adalah ringkasan fitur utama yang telah diimplementasikan:
 
-Instalasi Laravel Breeze: Sistem login dan register dasar.
+1.  **Instalasi Laravel Breeze:** Sistem login dan register dasar.
+2.  **Kolom `role`:** Ditambahkan pada tabel `users` untuk membedakan `admin` dan `user`.
+3.  **Middleware Admin:** Dibuat untuk memproteksi *route* `/admin`.
+4.  **Route:**
+    * `/dashboard` diakses oleh `user` biasa.
+    * `/admin` hanya diakses oleh `admin`.
 
-Kolom role: Ditambahkan pada tabel users untuk membedakan admin dan user.
+---
 
-Middleware Admin: Dibuat untuk memproteksi route /admin.
+## 🔑 Akun Uji Coba
 
-Route:
+Akun yang digunakan untuk menguji hak akses (dibuat melalui Seeder):
 
-/dashboard diakses oleh user biasa.
+| Peran | Email | Password |
+| :--- | :--- | :--- |
+| **Admin** | `susisusi@admin.com` | `susi123` |
+| **User Biasa** | `yonoyono@user.com` | `yono123` |
 
-/admin hanya diakses oleh admin.
+---
 
-🔑 Akun Uji Coba
+## 🖼️ Bukti Visual (Screenshots)
 
-Akun yang digunakan untuk menguji hak akses:
+### 1. Halaman Login
 
-Peran
+Halaman *Login* standar yang disediakan oleh Laravel Breeze.
 
-Email
+![Screenshot Halaman Login](screenshoot/halaman_login.png)
 
-Password
+### 2. Dashboard User (/dashboard)
 
-Admin
+Tampilan dashboard yang dapat diakses oleh **User Biasa** (`yonoyono@user.com`).
 
-susisusi@admin.com
+![Screenshot Dashboard User](screenshoot/sebagai_user.png)
 
-susi123
+### 3. Dashboard Admin (/admin)
 
-User Biasa
+Tampilan dashboard khusus yang hanya dapat diakses oleh **Admin** (`susisusi@admin.com`).
 
-yonoyono@user.com
+![Screenshot Dashboard Admin](screenshoot/sebagai_admin.png)
 
-yono123
+### 4. Hasil `php artisan route:list`
 
-🖼️ Bukti Visual (Screenshots)
+Output yang menunjukkan *middleware* `admin` telah berhasil diterapkan pada *route* `/admin`.
 
-1. Halaman Login
+![Screenshot php artisan route:list](screenshoot/route_list.png)
 
-Halaman Login standar yang disediakan oleh Laravel Breeze.
+---
 
-!(https://www.google.com/search?q=https://placehold.co/800x400/06b6d4/ffffff%3Ftext%3DScreenshot%2BHalaman%2BLogin)
-
-2. Dashboard User (/dashboard)
-
-Tampilan dashboard yang dapat diakses oleh User Biasa (yonoyono@user.com).
-
-!(https://www.google.com/search?q=https://placehold.co/800x400/34d399/000000%3Ftext%3DScreenshot%2BDashboard%2BUser)
-
-3. Dashboard Admin (/admin)
-
-Tampilan dashboard khusus yang hanya dapat diakses oleh Admin (susisusi@admin.com).
-
-4. Hasil php artisan route:list
-
-Output yang menunjukkan middleware admin telah berhasil diterapkan pada route /admin.
-
-!(https://www.google.com/search?q=https://placehold.co/800x400/9333ea/ffffff%3Ftext%3DScreenshot%2Bphp%2Bartisan%2Broute:list)
-
-Dibuat oleh: [Nama Anda]
+**Dibuat oleh: [Kurnia Risky Ramadhani]**
