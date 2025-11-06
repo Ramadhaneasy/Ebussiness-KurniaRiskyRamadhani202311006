@@ -1,59 +1,123 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+💼 EBUSINESS POS - APLIKASI LARAVEL BERBASIS ROLE
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+📝 Deskripsi Proyek
 
-## About Laravel
+Proyek ini adalah implementasi awal dari sistem Point of Sale (POS) atau aplikasi eBusiness menggunakan framework Laravel, yang berfokus pada manajemen otentikasi (login) dan otorisasi (hak akses) berbasis peran (Role-Based Access Control / RBAC).
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Aplikasi ini membedakan akses antara Administrator (Admin), yang memiliki hak penuh ke dashboard manajemen, dan User Biasa (Kasir), yang memiliki akses terbatas ke dashboard operasional.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+✨ Fitur Utama (Implementasi Tugas)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Berdasarkan instruksi yang diberikan, fitur-fitur yang telah berhasil diimplementasikan adalah:
 
-## Learning Laravel
+Instalasi Laravel Breeze: Implementasi penuh sistem Login dan Register (Authentication Scaffolding).
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+Role Management: Penambahan kolom role pada tabel users untuk membedakan peran (admin dan user).
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Dashboard Berbasis Peran:
 
-## Laravel Sponsors
+Dashboard User: Dapat diakses oleh semua pengguna yang terotentikasi dan terverifikasi di route /dashboard.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Dashboard Admin: Dashboard manajemen eksklusif yang hanya dapat diakses oleh pengguna dengan role='admin' di route /admin.
 
-### Premium Partners
+Admin Middleware: Implementasi custom middleware bernama admin untuk memproteksi route /admin dari akses pengguna biasa.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+🛠️ Panduan Instalasi (Development)
 
-## Contributing
+Ikuti langkah-langkah di bawah ini untuk menjalankan proyek secara lokal:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+1. Kloning Repositori & Instal Dependensi
 
-## Code of Conduct
+# Kloning dari GitHub
+git clone [https://github.com/nama_kalian/ebusiness2-nama_kalian.git](https://github.com/nama_kalian/ebusiness2-nama_kalian.git)
+cd ebusiness2-nama_kalian
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# Instal dependensi PHP (Composer)
+composer install
 
-## Security Vulnerabilities
+# Instal dependensi Node.js (NPM)
+npm install
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
-## License
+2. Konfigurasi Database
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Salin file .env.example menjadi .env.
+
+cp .env.example .env
+
+
+Atur kredensial database Anda (DB_DATABASE, DB_USERNAME, dll.) di file .env.
+
+Buat App Key.
+
+php artisan key:generate
+
+
+3. Migrasi dan Seeder (Membuat Tabel & Akun Uji)
+
+Jalankan migrasi untuk membuat semua tabel (termasuk users, orders, dan activities) dan mengisi data akun uji coba.
+
+# Menjalankan migrasi dan seeder secara bersamaan
+php artisan migrate:fresh --seed
+
+
+4. Kompilasi Aset dan Jalankan Server
+
+# Kompilasi aset CSS/JS (Tailwind)
+npm run dev
+
+# Jalankan server lokal Laravel
+php artisan serve
+
+
+🔑 Akun Uji Coba
+
+Setelah menjalankan php artisan migrate:fresh --seed, Anda dapat menguji hak akses menggunakan akun berikut (berdasarkan DatabaseSeeder.php terakhir):
+
+Peran (Role)
+
+Email
+
+Password
+
+Status Akses ke /admin
+
+Admin
+
+susisusi@admin.com
+
+susi123
+
+✅ Diizinkan
+
+User Biasa
+
+yonoyono@user.com
+
+yono123
+
+❌ Ditolak (Redirect ke /dashboard)
+
+🖼️ Dokumentasi Implementasi
+
+Berikut adalah bukti implementasi dari fitur-fitur yang diminta. (Ganti teks di bawah ini dengan link gambar screenshot Anda)
+
+1. Hasil php artisan route:list
+
+Tunjukkan bahwa middleware admin telah diterapkan dengan benar pada route /admin.
+
+2. Halaman Login
+
+Bukti bahwa sistem otentikasi (Breeze) berfungsi.
+
+3. Dashboard User
+
+Bukti bahwa user biasa (yonoyono@user.com) dapat mengakses /dashboard dan hanya melihat data pribadinya (jika ada).
+
+4. Dashboard Admin
+
+Bukti bahwa admin (susisusi@admin.com) dapat mengakses /admin dan melihat dashboard manajemen.
+
+🤝 Kontributor
+
+[Nama Anda] - [NIM/Role Anda]
