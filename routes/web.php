@@ -23,9 +23,8 @@ Route::middleware(['auth', 'verified', 'admin'])
         Route::get('/', [AdminDashboard::class, 'index'])
             ->name('dashboard');
         
-        // Users Management
-        Route::get('/users', [UserController::class, 'index'])
-            ->name('users.index');
+        // Users Management - CRUD LENGKAP
+        Route::resource('users', UserController::class);
         
         // Products Management - CRUD LENGKAP
         Route::resource('products', ProductController::class);
