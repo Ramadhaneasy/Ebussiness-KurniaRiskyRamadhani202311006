@@ -3,6 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\User\DashboardController as UserDashboard;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\ProfileController;
 
 Route::view('/', 'welcome');
@@ -19,6 +22,17 @@ Route::middleware(['auth', 'verified', 'admin'])
     ->group(function () {
         Route::get('/', [AdminDashboard::class, 'index'])
             ->name('dashboard');
+        
+        // Users Management
+        Route::get('/users', [UserController::class, 'index'])
+            ->name('users.index');
+        
+        // Products Management - CRUD LENGKAP
+        Route::resource('products', ProductController::class);
+        
+        // Reports
+        Route::get('/reports', [ReportController::class, 'index'])
+            ->name('reports.index');
     });
 
 // Profile (untuk user & admin)
