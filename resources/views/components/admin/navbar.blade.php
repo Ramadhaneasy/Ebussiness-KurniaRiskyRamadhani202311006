@@ -1,5 +1,5 @@
 <nav class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 fixed w-full z-30 top-0">
-    <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+    <div class="px-4 py-3 flex items-center justify-between">
         <div class="flex items-center gap-4">
             <button id="sidebar-toggle" class="p-2 rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -7,7 +7,7 @@
                 </svg>
             </button>
             <div class="text-lg font-semibold text-gray-900 dark:text-white">Admin Dashboard</div>
-            <p class="text-sm text-gray-500 dark:text-gray-400 ml-2 hidden md:block">
+            <p class="text-sm text-gray-500 dark:text-gray-400 hidden lg:block">
                 Welcome back — here's what's happening today.
             </p>
         </div>
@@ -30,7 +30,7 @@
                 </span>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button class="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 text-sm transition">
+                    <button class="bg-red-500 text-white px-3 py-1 rounded-md hover:red-600 text-sm transition">
                         Logout
                     </button>
                 </form>

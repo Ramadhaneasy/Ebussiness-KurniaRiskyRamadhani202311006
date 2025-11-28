@@ -8,7 +8,7 @@
     
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-gray-50 dark:bg-gray-900">
+<body class="bg-gray-50 dark:bg-900">
     
     {{-- Navbar --}}
     <x-admin.navbar />
@@ -18,11 +18,11 @@
         <x-admin.sidebar :active="$active ?? 'dashboard'" />
 
         {{-- Main Content --}}
-        <main id="main-content" class="flex-1 p-6 bg-gray-50 dark:bg-gray-900 min-h-screen transition-all duration-300" style="margin-left: 288px;">
+        <div id="main-content" class="flex-1 p-6 bg-gray-50 dark:bg-gray-900 min-height-screen transition-all duration-300" style="margin-left: 256px;">
             <div class="max-w-7xl mx-auto">
                 @yield('content')
             </div>
-        </main>
+        </div>
     </div>
 
     {{-- Overlay untuk mobile --}}
@@ -54,13 +54,13 @@
                     // Desktop: sidebar visible
                     sidebar.style.transform = 'translateX(0)';
                     if (isCollapsed) {
-                        sidebar.style.width = '80px';
-                        mainContent.style.marginLeft = '80px';
+                        sidebar.style.width = '64px';
+                        mainContent.style.marginLeft = '64px';
                         sidebarTexts.forEach(el => el.style.display = 'none');
                         sidebarHeader.style.display = 'none';
                     } else {
-                        sidebar.style.width = '288px';
-                        mainContent.style.marginLeft = '288px';
+                        sidebar.style.width = '256px';
+                        marginLeft = '256px';
                         sidebarTexts.forEach(el => el.style.display = 'block');
                         sidebarHeader.style.display = 'block';
                     }
@@ -83,13 +83,13 @@
                     isCollapsed = !isCollapsed;
                     
                     if (isCollapsed) {
-                        sidebar.style.width = '80px';
-                        mainContent.style.marginLeft = '80px';
+                        sidebar.style.width = '64px';
+                        mainContent.style.marginLeft = '64px';
                         sidebarTexts.forEach(el => el.style.display = 'none');
                         sidebarHeader.style.display = 'none';
                     } else {
-                        sidebar.style.width = '288px';
-                        mainContent.style.marginLeft = '288px';
+                        sidebar.style.width = '256px';
+                        mainContent.style.marginLeft = '256px';
                         sidebarTexts.forEach(el => el.style.display = 'block');
                         sidebarHeader.style.display = 'block';
                     }
