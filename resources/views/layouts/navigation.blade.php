@@ -15,11 +15,35 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+
+                    <x-nav-link :href="route('shop.index')" :active="request()->routeIs('shop.*')">
+                        {{ __('Shop') }}
+                    </x-nav-link>
+
+                    <x-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')">
+                        {{ __('My Orders') }}
+                    </x-nav-link>
                 </div>
             </div>
 
-            <!-- Settings Dropdown -->
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
+            <!-- Right Side: Cart & User Dropdown -->
+            <div class="hidden sm:flex sm:items-center sm:gap-4 sm:ms-6">
+                <!-- Cart Icon -->
+                <a href="{{ route('cart.index') }}" class="relative inline-flex items-center px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                    </svg>
+                    @php
+                        $cartCount = auth()->user()->carts()->count();
+                    @endphp
+                    @if($cartCount > 0)
+                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                            {{ $cartCount }}
+                        </span>
+                    @endif
+                </a>
+
+                <!-- Settings Dropdown -->
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
@@ -69,6 +93,18 @@
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('shop.index')" :active="request()->routeIs('shop.*')">
+                {{ __('Shop') }}
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('cart.index')" :active="request()->routeIs('cart.*')">
+                {{ __('Cart') }} @if($cartCount > 0)({{ $cartCount }})@endif
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')">
+                {{ __('My Orders') }}
             </x-responsive-nav-link>
         </div>
 

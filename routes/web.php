@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\User\DashboardController as UserDashboard;
+use App\Http\Controllers\User\ShopController;
+use App\Http\Controllers\User\CartController;
+use App\Http\Controllers\User\CheckoutController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ProductController;
@@ -10,31 +13,37 @@ use App\Http\Controllers\ProfileController;
 
 Route::view('/', 'welcome');
 
-// Dashboard User
-Route::middleware(['auth', 'verified'])
-    ->get('/dashboard', [UserDashboard::class, 'index'])
-    ->name('dashboard');
+// User Routes (harus login)
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [UserDashboard::class, 'index'])->name('dashboard');
+    
+    // Shop
+    Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
+    Route::get('/shop/{product}', [ShopController::class, 'show'])->name('shop.show');
+    
+    // Cart
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
+    Route::patch('/cart/update/{cart}', [CartController::class, 'update'])->name('cart.update');
+    Route::delete('/cart/remove/{cart}', [CartController::class, 'remove'])->name('cart.remove');
+    
+    // Checkout
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process');
+    Route::get('/orders', [CheckoutController::class, 'orders'])->name('orders.index');
+    Route::get('/orders/{order}', [CheckoutController::class, 'show'])->name('orders.show');
+});
 
-// Dashboard Admin
-Route::middleware(['auth', 'verified', 'admin'])
-    ->prefix('admin')
-    ->as('admin.')
-    ->group(function () {
-        Route::get('/', [AdminDashboard::class, 'index'])
-            ->name('dashboard');
-        
-        // Users Management - CRUD LENGKAP
-        Route::resource('users', UserController::class);
-        
-        // Products Management - CRUD LENGKAP
-        Route::resource('products', ProductController::class);
-        
-        // Reports
-        Route::get('/reports', [ReportController::class, 'index'])
-            ->name('reports.index');
-    });
+// Admin Routes
+Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->as('admin.')->group(function () {
+    Route::get('/', [AdminDashboard::class, 'index'])->name('dashboard');
+    Route::resource('users', UserController::class);
+    Route::resource('products', ProductController::class);
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+});
 
-// Profile (untuk user & admin)
+// Profile
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

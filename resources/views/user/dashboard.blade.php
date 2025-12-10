@@ -10,8 +10,11 @@
             {{-- Welcome Card --}}
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-6">
                 <div class="p-6">
+                    @php
+                        $cleanName = preg_replace('/\s*\([^)]*\)/', '', Auth::user()->name);
+                    @endphp
                     <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                        Welcome back, {{ Auth::user()->name }}! 👋
+                        Welcome back, {{ $cleanName }}! 👋
                     </h3>
                     <p class="text-gray-600 dark:text-gray-400">
                         Here's an overview of your activity today.
@@ -58,7 +61,7 @@
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">Pending Orders</p>
-                                <p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">5</p>
+                                <p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ $pendingOrders }}</p>
                             </div>
                             <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900/20 rounded-lg flex items-center justify-center">
                                 <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -74,7 +77,7 @@
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">Completed</p>
-                                <p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">142</p>
+                                <p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ $completedOrders }}</p>
                             </div>
                             <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/20 rounded-lg flex items-center justify-center">
                                 <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -89,43 +92,54 @@
             {{-- Recent Orders --}}
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Recent Orders</h3>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full text-sm">
-                            <thead>
-                                <tr class="text-left text-gray-500 dark:text-gray-400 border-b dark:border-gray-700">
-                                    <th class="py-3">Order ID</th>
-                                    <th class="py-3">Product</th>
-                                    <th class="py-3">Amount</th>
-                                    <th class="py-3">Status</th>
-                                    <th class="py-3">Date</th>
-                                </tr>
-                            </thead>
-                            <tbody class="text-gray-700 dark:text-gray-300">
-                                <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
-                                    <td class="py-3 font-medium">#ORD-001</td>
-                                    <td class="py-3">Wireless Earbuds</td>
-                                    <td class="py-3">Rp 850,000</td>
-                                    <td class="py-3"><span class="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full">Completed</span></td>
-                                    <td class="py-3">Today</td>
-                                </tr>
-                                <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
-                                    <td class="py-3 font-medium">#ORD-002</td>
-                                    <td class="py-3">Smart Watch</td>
-                                    <td class="py-3">Rp 1,200,000</td>
-                                    <td class="py-3"><span class="px-2 py-1 text-xs bg-yellow-100 text-yellow-700 rounded-full">Pending</span></td>
-                                    <td class="py-3">Today</td>
-                                </tr>
-                                <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
-                                    <td class="py-3 font-medium">#ORD-003</td>
-                                    <td class="py-3">USB-C Cable</td>
-                                    <td class="py-3">Rp 45,000</td>
-                                    <td class="py-3"><span class="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">Processing</span></td>
-                                    <td class="py-3">Today</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Recent Orders</h3>
+                        <a href="{{ route('orders.index') }}" class="text-blue-600 hover:underline text-sm">View All</a>
                     </div>
+                    
+                    @if($recentOrders->count() > 0)
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full text-sm">
+                                <thead>
+                                    <tr class="text-left text-gray-500 dark:text-gray-400 border-b dark:border-gray-700">
+                                        <th class="py-3">Order ID</th>
+                                        <th class="py-3">Product</th>
+                                        <th class="py-3">Amount</th>
+                                        <th class="py-3">Status</th>
+                                        <th class="py-3">Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-gray-700 dark:text-gray-300">
+                                    @foreach($recentOrders as $order)
+                                        <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
+                                            <td class="py-3 font-medium">{{ $order->order_number }}</td>
+                                            <td class="py-3">
+                                                @if($order->items->count() > 1)
+                                                    {{ $order->items->first()->product_name }} +{{ $order->items->count() - 1 }} more
+                                                @else
+                                                    {{ $order->items->first()->product_name }}
+                                                @endif
+                                            </td>
+                                            <td class="py-3">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</td>
+                                            <td class="py-3">
+                                                @if($order->status === 'completed')
+                                                    <span class="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full">Completed</span>
+                                                @else
+                                                    <span class="px-2 py-1 text-xs bg-yellow-100 text-yellow-700 rounded-full">Pending</span>
+                                                @endif
+                                            </td>
+                                            <td class="py-3">{{ $order->created_at->diffForHumans() }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <div class="text-center py-8">
+                            <p class="text-gray-600 dark:text-gray-400">No orders yet</p>
+                            <a href="{{ route('shop.index') }}" class="inline-block mt-3 text-blue-600 hover:underline">Start Shopping</a>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

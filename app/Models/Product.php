@@ -22,4 +22,16 @@ class Product extends Model
         'price' => 'decimal:2',
         'stock' => 'integer',
     ];
+
+    // Relationship: Product has many Carts
+    public function carts()
+    {
+        return $this->hasMany(Cart::class);
+    }
+
+    // Relationship: Product has many OrderItems
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
 }

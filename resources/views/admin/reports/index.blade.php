@@ -3,7 +3,7 @@
 @section('content')
     <div class="mb-6">
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Reports & Analytics</h1>
-        <p class="text-gray-600 dark:text-gray-400 mt-1">View detailed reports and insights</p>
+        <p class="text-gray-600 dark:text-gray-400 mt-1">Comprehensive business insights and data</p>
     </div>
 
     {{-- Summary Cards --}}
@@ -12,8 +12,10 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-500 dark:text-gray-400">Total Revenue</p>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white mt-2">Rp 45.2M</p>
-                    <p class="text-xs text-green-600 mt-1">+12.5% from last month</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white mt-2">
+                        Rp {{ number_format($totalRevenue / 1000000, 1) }}M
+                    </p>
+                    <p class="text-xs text-gray-500 mt-1">All time</p>
                 </div>
                 <div class="w-12 h-12 bg-green-100 dark:bg-green-900/20 rounded-lg flex items-center justify-center">
                     <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -27,8 +29,14 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-500 dark:text-gray-400">Total Orders</p>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white mt-2">1,248</p>
-                    <p class="text-xs text-blue-600 mt-1">+8.3% from last month</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white mt-2">{{ number_format($totalOrders) }}</p>
+                    @if($revenueChange > 0)
+                        <p class="text-xs text-green-600 mt-1">+{{ number_format($revenueChange, 1) }}% this month</p>
+                    @elseif($revenueChange < 0)
+                        <p class="text-xs text-red-600 mt-1">{{ number_format($revenueChange, 1) }}% this month</p>
+                    @else
+                        <p class="text-xs text-gray-500 mt-1">0% change</p>
+                    @endif
                 </div>
                 <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
                     <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -42,8 +50,10 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-500 dark:text-gray-400">Avg Order Value</p>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white mt-2">Rp 362K</p>
-                    <p class="text-xs text-purple-600 mt-1">+5.2% from last month</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white mt-2">
+                        Rp {{ number_format($averageOrderValue / 1000, 0) }}K
+                    </p>
+                    <p class="text-xs text-gray-500 mt-1">Per transaction</p>
                 </div>
                 <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/20 rounded-lg flex items-center justify-center">
                     <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -57,8 +67,8 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-500 dark:text-gray-400">New Customers</p>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white mt-2">234</p>
-                    <p class="text-xs text-orange-600 mt-1">+15.7% from last month</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white mt-2">{{ $newCustomersThisMonth }}</p>
+                    <p class="text-xs text-gray-500 mt-1">This month</p>
                 </div>
                 <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900/20 rounded-lg flex items-center justify-center">
                     <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -69,6 +79,14 @@
         </div>
     </div>
 
+    {{-- Monthly Revenue Chart --}}
+    <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 mb-6">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Monthly Revenue Trend</h3>
+        <div class="w-full h-64">
+            <canvas id="monthly-chart"></canvas>
+        </div>
+    </div>
+
     {{-- Detailed Reports --}}
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
@@ -76,23 +94,23 @@
             <div class="space-y-4">
                 <div class="flex justify-between items-center">
                     <span class="text-gray-600 dark:text-gray-400">Total Sales</span>
-                    <span class="font-semibold text-gray-900 dark:text-white">Rp 45,200,000</span>
+                    <span class="font-semibold text-gray-900 dark:text-white">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</span>
                 </div>
                 <div class="flex justify-between items-center">
                     <span class="text-gray-600 dark:text-gray-400">Total Orders</span>
-                    <span class="font-semibold text-gray-900 dark:text-white">1,248</span>
+                    <span class="font-semibold text-gray-900 dark:text-white">{{ number_format($totalOrders) }}</span>
                 </div>
                 <div class="flex justify-between items-center">
                     <span class="text-gray-600 dark:text-gray-400">Average Order Value</span>
-                    <span class="font-semibold text-gray-900 dark:text-white">Rp 362,000</span>
+                    <span class="font-semibold text-gray-900 dark:text-white">Rp {{ number_format($averageOrderValue, 0, ',', '.') }}</span>
                 </div>
                 <div class="flex justify-between items-center">
                     <span class="text-gray-600 dark:text-gray-400">Completed Orders</span>
-                    <span class="font-semibold text-gray-900 dark:text-white">1,102 (88%)</span>
+                    <span class="font-semibold text-gray-900 dark:text-white">{{ number_format($completedOrders) }} ({{ number_format($completedPercentage, 1) }}%)</span>
                 </div>
                 <div class="flex justify-between items-center">
                     <span class="text-gray-600 dark:text-gray-400">Pending Orders</span>
-                    <span class="font-semibold text-gray-900 dark:text-white">146 (12%)</span>
+                    <span class="font-semibold text-gray-900 dark:text-white">{{ number_format($pendingOrders) }} ({{ number_format($pendingPercentage, 1) }}%)</span>
                 </div>
             </div>
         </div>
@@ -102,51 +120,163 @@
             <div class="space-y-4">
                 <div class="flex justify-between items-center">
                     <span class="text-gray-600 dark:text-gray-400">Total Customers</span>
-                    <span class="font-semibold text-gray-900 dark:text-white">8,462</span>
+                    <span class="font-semibold text-gray-900 dark:text-white">{{ number_format($totalCustomers) }}</span>
                 </div>
                 <div class="flex justify-between items-center">
                     <span class="text-gray-600 dark:text-gray-400">New This Month</span>
-                    <span class="font-semibold text-gray-900 dark:text-white">234</span>
+                    <span class="font-semibold text-gray-900 dark:text-white">{{ number_format($newCustomersThisMonth) }}</span>
                 </div>
                 <div class="flex justify-between items-center">
                     <span class="text-gray-600 dark:text-gray-400">Active Users</span>
-                    <span class="font-semibold text-gray-900 dark:text-white">5,122 (61%)</span>
+                    <span class="font-semibold text-gray-900 dark:text-white">{{ number_format($activeCustomers) }} ({{ number_format($activePercentage, 1) }}%)</span>
                 </div>
                 <div class="flex justify-between items-center">
                     <span class="text-gray-600 dark:text-gray-400">Returning Customers</span>
-                    <span class="font-semibold text-gray-900 dark:text-white">3,284 (39%)</span>
+                    <span class="font-semibold text-gray-900 dark:text-white">{{ number_format($returningCustomers) }} ({{ number_format($returningPercentage, 1) }}%)</span>
                 </div>
                 <div class="flex justify-between items-center">
                     <span class="text-gray-600 dark:text-gray-400">Customer Retention</span>
-                    <span class="font-semibold text-gray-900 dark:text-white">76%</span>
+                    <span class="font-semibold text-gray-900 dark:text-white">{{ number_format($retentionRate, 1) }}%</span>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- Export Section --}}
+    {{-- Top Customers --}}
+    @if($topCustomers->count() > 0)
+    <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 mb-6">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Top Customers</h3>
+        <div class="overflow-x-auto">
+            <table class="min-w-full text-sm">
+                <thead>
+                    <tr class="text-left text-gray-500 dark:text-gray-300 border-b dark:border-gray-700">
+                        <th class="py-3">Rank</th>
+                        <th class="py-3">Customer</th>
+                        <th class="py-3">Email</th>
+                        <th class="py-3">Total Orders</th>
+                        <th class="py-3">Total Spent</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-700 dark:text-gray-300">
+                    @foreach($topCustomers as $index => $customer)
+                    <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
+                        <td class="py-3 font-bold">{{ $index + 1 }}</td>
+                        <td class="py-3">{{ $customer->user->name }}</td>
+                        <td class="py-3">{{ $customer->user->email }}</td>
+                        <td class="py-3">{{ $customer->total_orders }}</td>
+                        <td class="py-3 font-semibold">Rp {{ number_format($customer->total_spent, 0, ',', '.') }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @endif
+
+    {{-- All Orders Table --}}
     <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">All Orders</h3>
+        
+        @if($allOrders->count() > 0)
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-sm">
+                    <thead>
+                        <tr class="text-left text-gray-500 dark:text-gray-300 border-b dark:border-gray-700">
+                            <th class="py-3">Order Number</th>
+                            <th class="py-3">Customer</th>
+                            <th class="py-3">Items</th>
+                            <th class="py-3">Amount</th>
+                            <th class="py-3">Status</th>
+                            <th class="py-3">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-700 dark:text-gray-300">
+                        @foreach($allOrders as $order)
+                        <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
+                            <td class="py-3 font-medium">{{ $order->order_number }}</td>
+                            <td class="py-3">{{ $order->user->name }}</td>
+                            <td class="py-3">{{ $order->items->count() }} item(s)</td>
+                            <td class="py-3">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</td>
+                            <td class="py-3">
+                                @if($order->status === 'completed')
+                                    <span class="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full">Completed</span>
+                                @else
+                                    <span class="px-2 py-1 text-xs bg-yellow-100 text-yellow-700 rounded-full">Pending</span>
+                                @endif
+                            </td>
+                            <td class="py-3">{{ $order->created_at->format('d M Y') }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-4">
+                {{ $allOrders->links() }}
+            </div>
+        @else
+            <div class="text-center py-8 text-gray-500">No orders yet</div>
+        @endif
+    </div>
+
+    {{-- Export Section --}}
+    <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 mt-6">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Export Reports</h3>
         <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Download your reports in various formats</p>
         <div class="flex flex-wrap gap-3">
-            <button class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition flex items-center gap-2">
+            <button class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition flex items-center gap-2" onclick="alert('Excel export feature coming soon!')">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
                 Export to Excel
             </button>
-            <button class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition flex items-center gap-2">
+            <button class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition flex items-center gap-2" onclick="window.print()">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
                 </svg>
-                Export to PDF
-            </button>
-            <button class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                </svg>
-                Export to CSV
+                Print Report
             </button>
         </div>
     </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('monthly-chart');
+    const monthlyData = @json($monthlyRevenue);
+    
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: monthlyData.map(d => d.month),
+            datasets: [{
+                label: 'Revenue (Rp)',
+                data: monthlyData.map(d => d.revenue),
+                backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                borderColor: '#3B82F6',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return 'Rp ' + (value / 1000000).toFixed(1) + 'M';
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+@endpush
