@@ -16,14 +16,14 @@
 
             <form action="{{ route('checkout.process') }}" method="POST">
                 @csrf
-                
+
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {{-- Shipping Info --}}
                     <div class="lg:col-span-2">
                         <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-6">
                             <div class="p-6">
                                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Shipping Information</h3>
-                                
+
                                 <div class="mb-4">
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Full Name</label>
                                     <input type="text" value="{{ auth()->user()->name }}" disabled
@@ -59,16 +59,32 @@
                         <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                             <div class="p-6">
                                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Payment Method</h3>
-                                
-                                <div class="flex items-center p-4 border-2 border-blue-500 rounded-lg bg-blue-50 dark:bg-blue-900/20">
-                                    <svg class="w-8 h-8 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
-                                    </svg>
+
+                                @error('payment_method')
+                                    <p class="text-red-500 text-sm mb-3">{{ $message }}</p>
+                                @enderror
+
+                                @php
+                                    $pm = old('payment_method', 'COD');
+                                @endphp
+
+                                <label class="flex items-center p-4 border-2 rounded-lg cursor-pointer mb-3
+                                    {{ $pm === 'COD' ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-300 dark:border-gray-700' }}">
+                                    <input type="radio" name="payment_method" value="COD" class="mr-3" {{ $pm === 'COD' ? 'checked' : '' }}>
                                     <div>
                                         <p class="font-semibold text-gray-900 dark:text-white">Cash on Delivery (COD)</p>
                                         <p class="text-sm text-gray-600 dark:text-gray-400">Pay when you receive the product</p>
                                     </div>
-                                </div>
+                                </label>
+
+                                <label class="flex items-center p-4 border-2 rounded-lg cursor-pointer
+                                    {{ $pm === 'BANK_TRANSFER' ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-300 dark:border-gray-700' }}">
+                                    <input type="radio" name="payment_method" value="BANK_TRANSFER" class="mr-3" {{ $pm === 'BANK_TRANSFER' ? 'checked' : '' }}>
+                                    <div>
+                                        <p class="font-semibold text-gray-900 dark:text-white">Bank Transfer</p>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">Upload proof after placing order</p>
+                                    </div>
+                                </label>
                             </div>
                         </div>
                     </div>
@@ -78,7 +94,7 @@
                         <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg sticky top-6">
                             <div class="p-6">
                                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Order Summary</h3>
-                                
+
                                 <div class="space-y-3 mb-4">
                                     @foreach($carts as $cart)
                                         <div class="flex justify-between text-sm">

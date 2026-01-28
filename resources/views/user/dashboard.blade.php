@@ -1,147 +1,216 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('User Dashboard') }}
-        </h2>
+        <div class="flex items-start justify-between gap-4">
+            <div>
+                <h2 class="text-xl font-extrabold text-sky-900">Welcome Back, {{ Auth::user()->name }}!</h2>
+                <p class="text-sm text-sky-700 mt-1">Order Tracking</p>
+            </div>
+
+            <a href="{{ route('orders.index') }}"
+               class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-sky-600 text-white font-semibold hover:bg-sky-700 transition">
+                View Orders
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                </svg>
+            </a>
+        </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            {{-- Welcome Card --}}
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-6">
-                <div class="p-6">
-                    @php
-                        $cleanName = preg_replace('/\s*\([^)]*\)/', '', Auth::user()->name);
-                    @endphp
-                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                        Welcome back, {{ $cleanName }}! 👋
-                    </h3>
-                    <p class="text-gray-600 dark:text-gray-400">
-                        Here's an overview of your activity today.
-                    </p>
-                </div>
-            </div>
-
-            {{-- Stats Cards --}}
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Orders Today</p>
-                                <p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ $ordersToday }}</p>
-                            </div>
-                            <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
-                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Revenue Today</p>
-                                <p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">Rp {{ number_format($revenueToday, 0, ',', '.') }}</p>
-                            </div>
-                            <div class="w-12 h-12 bg-green-100 dark:bg-green-900/20 rounded-lg flex items-center justify-center">
-                                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Pending Orders</p>
-                                <p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ $pendingOrders }}</p>
-                            </div>
-                            <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900/20 rounded-lg flex items-center justify-center">
-                                <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Completed</p>
-                                <p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ $completedOrders }}</p>
-                            </div>
-                            <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/20 rounded-lg flex items-center justify-center">
-                                <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Recent Orders --}}
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Recent Orders</h3>
-                        <a href="{{ route('orders.index') }}" class="text-blue-600 hover:underline text-sm">View All</a>
-                    </div>
-                    
-                    @if($recentOrders->count() > 0)
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full text-sm">
-                                <thead>
-                                    <tr class="text-left text-gray-500 dark:text-gray-400 border-b dark:border-gray-700">
-                                        <th class="py-3">Order ID</th>
-                                        <th class="py-3">Product</th>
-                                        <th class="py-3">Amount</th>
-                                        <th class="py-3">Status</th>
-                                        <th class="py-3">Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="text-gray-700 dark:text-gray-300">
-                                    @foreach($recentOrders as $order)
-                                        <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
-                                            <td class="py-3 font-medium">{{ $order->order_number }}</td>
-                                            <td class="py-3">
-                                                @if($order->items->count() > 1)
-                                                    {{ $order->items->first()->product_name }} +{{ $order->items->count() - 1 }} more
-                                                @else
-                                                    {{ $order->items->first()->product_name }}
-                                                @endif
-                                            </td>
-                                            <td class="py-3">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</td>
-                                            <td class="py-3">
-                                                @if($order->status === 'completed')
-                                                    <span class="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full">Completed</span>
-                                                @else
-                                                    <span class="px-2 py-1 text-xs bg-yellow-100 text-yellow-700 rounded-full">Pending</span>
-                                                @endif
-                                            </td>
-                                            <td class="py-3">{{ $order->created_at->diffForHumans() }}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @else
-                        <div class="text-center py-8">
-                            <p class="text-gray-600 dark:text-gray-400">No orders yet</p>
-                            <a href="{{ route('shop.index') }}" class="inline-block mt-3 text-blue-600 hover:underline">Start Shopping</a>
-                        </div>
-                    @endif
-                </div>
-            </div>
+    {{-- Alerts --}}
+    @if(session('success'))
+        <div class="mb-4 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-emerald-800">
+            {{ session('success') }}
         </div>
+    @endif
+    @if(session('error'))
+        <div class="mb-4 rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-rose-800">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    {{-- ORDER TRACKING --}}
+    <div class="rounded-2xl border border-sky-100 bg-white/70 p-5 mb-6">
+        <div class="flex items-center justify-between">
+            <h3 class="text-lg font-extrabold text-sky-900">Order Tracking</h3>
+            <span class="text-xs font-semibold text-sky-700 px-3 py-1 rounded-full border border-sky-100 bg-sky-50">
+                {{ $trackedOrder ? 'Active Order' : 'No Active Order' }}
+            </span>
+        </div>
+
+        {{-- Stepper --}}
+        @php
+            $steps = [
+                'payment_pending' => 'Payment pending',
+                'packaging' => 'Packaging',
+                'shipped' => 'Shipped',
+                'completed' => 'Completed',
+            ];
+
+            $orderStepOrder = ['payment_pending', 'packaging', 'shipped', 'completed'];
+            $activeIndex = array_search($trackingStep, $orderStepOrder);
+        @endphp
+
+        <div class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2">
+            @foreach($orderStepOrder as $i => $key)
+                @php
+                    $isActive = $i === $activeIndex;
+                    $isDone = $i < $activeIndex;
+                @endphp
+
+                <div class="px-3 py-2 rounded-xl border text-center text-xs font-semibold
+                    {{ $isActive ? 'bg-sky-600 border-sky-600 text-white' : ($isDone ? 'bg-emerald-50 border-emerald-100 text-emerald-700' : 'bg-white/60 border-sky-100 text-sky-900') }}">
+                    {{ $steps[$key] }}
+                </div>
+            @endforeach
+        </div>
+
+        {{-- Tracked Order Card --}}
+        <div class="mt-4 rounded-2xl border border-sky-100 bg-white/70 p-5">
+            @if(!$trackedOrder)
+                <div class="text-center text-gray-600 py-6">
+                    Belum ada order. Yuk belanja dulu 🙂
+                    <div class="mt-3">
+                        <a href="{{ route('shop.index') }}"
+                           class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-sky-600 text-white font-semibold hover:bg-sky-700 transition">
+                            Go to Shop
+                        </a>
+                    </div>
+                </div>
+            @else
+                @php
+                    $firstItem = $trackedOrder->items->first();
+                    $payment = $trackedOrder->payment;
+                    $needsPayment = $trackedOrder->payment_method === 'BANK_TRANSFER';
+                    $paymentPending = $needsPayment && $payment && $payment->status === 'pending';
+                    $badge = $paymentPending ? 'Pending Payment' : strtoupper($trackedOrder->status ?? 'PENDING');
+                    $badgeClass = $paymentPending
+                        ? 'bg-amber-50 text-amber-700 border-amber-100'
+                        : 'bg-sky-50 text-sky-700 border-sky-100';
+                @endphp
+
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <div class="text-lg font-extrabold text-sky-900">
+                                {{ $trackedOrder->order_number }}
+                            </div>
+                            <span class="px-3 py-1 rounded-full text-xs font-semibold border {{ $badgeClass }}">
+                                {{ $badge }}
+                            </span>
+                        </div>
+
+                        <div class="mt-2 text-sm text-gray-700">
+                            <div class="font-semibold">
+                                {{ $firstItem?->product_name ?? 'Product' }}
+                                @if($trackedOrder->items->count() > 1)
+                                    <span class="text-gray-500">+ {{ $trackedOrder->items->count() - 1 }} item(s)</span>
+                                @endif
+                            </div>
+                            <div class="text-gray-600 mt-1">
+                                Total: <span class="font-semibold">Rp {{ number_format($trackedOrder->total_amount, 0, ',', '.') }}</span>
+                                <span class="mx-2 text-gray-300">•</span>
+                                Method: <span class="font-semibold">{{ $trackedOrder->payment_method }}</span>
+                            </div>
+                        </div>
+
+                        <div class="text-xs text-gray-500 mt-3">
+                            Submitted {{ $trackedOrder->created_at->diffForHumans() }}
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <a href="{{ route('orders.show', $trackedOrder->id) }}"
+                           class="px-4 py-2 rounded-xl border border-sky-100 bg-white/60 hover:bg-sky-50 transition font-semibold text-sky-900 text-center">
+                            View Details
+                        </a>
+
+                        @if($trackedOrder->payment_method === 'BANK_TRANSFER')
+                            <a href="{{ route('payment.show', $trackedOrder->id) }}"
+                               class="px-4 py-2 rounded-xl bg-sky-600 text-white font-semibold hover:bg-sky-700 transition text-center">
+                                Complete Payment
+                            </a>
+                        @endif
+                    </div>
+                </div>
+            @endif
+        </div>
+    </div>
+
+    {{-- RECENT ORDERS --}}
+    <div class="rounded-2xl border border-sky-100 bg-white/70 overflow-hidden">
+        <div class="p-5 flex items-center justify-between">
+            <h3 class="text-lg font-extrabold text-sky-900">My Recent Orders</h3>
+            <a href="{{ route('orders.index') }}" class="text-sm font-semibold text-sky-700 hover:text-sky-900">
+                View All
+            </a>
+        </div>
+
+        @if($recentOrders->isEmpty())
+            <div class="p-6 text-center text-gray-600">
+                Belum ada order.
+            </div>
+        @else
+            <div class="divide-y divide-sky-100">
+                @foreach($recentOrders as $order)
+                    @php
+                        $payment = $order->payment;
+                        $needsPayment = $order->payment_method === 'BANK_TRANSFER';
+                        $paymentPending = $needsPayment && $payment && $payment->status === 'pending';
+
+                        $badge = $paymentPending ? 'Pending Payment' : strtoupper($order->status ?? 'PENDING');
+                        $badgeClass = $paymentPending
+                            ? 'bg-amber-50 text-amber-700 border-amber-100'
+                            : 'bg-emerald-50 text-emerald-700 border-emerald-100';
+
+                        $firstItem = $order->items->first();
+                    @endphp
+
+                    <div class="p-5 hover:bg-sky-50/60 transition">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <div class="font-extrabold text-sky-900">{{ $order->order_number }}</div>
+                                    <span class="px-3 py-1 rounded-full text-xs font-semibold border {{ $badgeClass }}">
+                                        {{ $badge }}
+                                    </span>
+                                </div>
+
+                                <div class="text-sm text-gray-700 mt-2">
+                                    <div class="font-semibold">
+                                        {{ $firstItem?->product_name ?? 'Product' }}
+                                        @if($order->items->count() > 1)
+                                            <span class="text-gray-500">+ {{ $order->items->count() - 1 }} item(s)</span>
+                                        @endif
+                                    </div>
+
+                                    <div class="text-gray-600 mt-1">
+                                        Total: <span class="font-semibold">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</span>
+                                        <span class="mx-2 text-gray-300">•</span>
+                                        {{ $order->created_at->diffForHumans() }}
+                                    </div>
+                                    <div class="text-xs text-gray-500 mt-1">
+                                        Method: {{ $order->payment_method }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-2">
+                                @if($needsPayment)
+                                    <a href="{{ route('payment.show', $order->id) }}"
+                                       class="px-4 py-2 rounded-xl bg-sky-600 text-white font-semibold hover:bg-sky-700 transition">
+                                        Complete Payment
+                                    </a>
+                                @else
+                                    <a href="{{ route('orders.show', $order->id) }}"
+                                       class="px-4 py-2 rounded-xl border border-sky-100 bg-white/60 hover:bg-sky-50 transition font-semibold text-sky-900">
+                                        View Details
+                                    </a>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @endif
     </div>
 </x-app-layout>

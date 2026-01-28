@@ -23,19 +23,22 @@ class Order extends Model
         'total_amount' => 'decimal:2',
     ];
 
-    // Relationship: Order belongs to User
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    // Relationship: Order has many OrderItems
     public function items()
     {
         return $this->hasMany(OrderItem::class);
     }
 
-    // Generate Order Number
+    // NEW: Order has one Payment
+    public function payment()
+    {
+        return $this->hasOne(Payment::class);
+    }
+
     public static function generateOrderNumber()
     {
         $date = date('Ymd');

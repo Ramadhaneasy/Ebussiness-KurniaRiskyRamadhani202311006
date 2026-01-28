@@ -14,104 +14,132 @@
                 </div>
             @endif
 
-            {{-- Order Info --}}
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-6">
-                <div class="p-6">
-                    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
-                        <div>
-                            <h3 class="text-2xl font-bold text-gray-900 dark:text-white">
-                                Order #{{ $order->order_number }}
-                            </h3>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                Placed on {{ $order->created_at->format('d M Y, H:i') }}
-                            </p>
-                        </div>
-
-                        @if($order->status === 'pending')
-                            <span class="px-4 py-2 text-lg bg-yellow-100 text-yellow-700 rounded-full font-semibold">Pending</span>
-                        @else
-                            <span class="px-4 py-2 text-lg bg-green-100 text-green-700 rounded-full font-semibold">Completed</span>
-                        @endif
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 border-t dark:border-gray-700 pt-6">
-                        <div>
-                            <h4 class="font-semibold text-gray-900 dark:text-white mb-2">Customer</h4>
-                            <p class="text-gray-600 dark:text-gray-400">{{ $order->user->name }}</p>
-                            <p class="text-gray-600 dark:text-gray-400">{{ $order->user->email }}</p>
-                        </div>
-
-                        <div>
-                            <h4 class="font-semibold text-gray-900 dark:text-white mb-2">Shipping Address</h4>
-                            <p class="text-gray-600 dark:text-gray-400 whitespace-pre-line">{{ $order->shipping_address }}</p>
-                        </div>
-
-                        <div>
-                            <h4 class="font-semibold text-gray-900 dark:text-white mb-2">Payment Method</h4>
-                            <p class="text-gray-600 dark:text-gray-400">{{ $order->payment_method }}</p>
-                            
-                            @if($order->notes)
-                                <h4 class="font-semibold text-gray-900 dark:text-white mb-2 mt-4">Notes</h4>
-                                <p class="text-gray-600 dark:text-gray-400">{{ $order->notes }}</p>
-                            @endif
-                        </div>
-                    </div>
+            {{-- Error Message --}}
+            @if(session('error'))
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+                    {{ session('error') }}
                 </div>
-            </div>
+            @endif
 
-            {{-- Order Items --}}
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-6">
-                <div class="p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Order Items</h3>
-                    
-                    <div class="space-y-4">
-                        @foreach($order->items as $item)
-                            <div class="flex items-center gap-4 border-b dark:border-gray-700 pb-4">
-                                <div class="w-20 h-20 flex-shrink-0">
-                                    @if($item->product && $item->product->image)
-                                        <img src="{{ Storage::url($item->product->image) }}" alt="{{ $item->product_name }}" class="w-full h-full object-cover rounded">
-                                    @else
-                                        <div class="w-full h-full bg-gradient-to-br from-blue-400 to-purple-600 rounded"></div>
-                                    @endif
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {{-- Order Info --}}
+                <div class="lg:col-span-2">
+                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                        <div class="p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Order Information</h3>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <p class="text-sm text-gray-500">Order Number</p>
+                                    <p class="font-semibold text-gray-900 dark:text-white">{{ $order->order_number }}</p>
                                 </div>
-
-                                <div class="flex-1">
-                                    <h4 class="font-semibold text-gray-900 dark:text-white">{{ $item->product_name }}</h4>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">Quantity: {{ $item->quantity }}</p>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">Price: Rp {{ number_format($item->price, 0, ',', '.') }}</p>
+                                <div>
+                                    <p class="text-sm text-gray-500">Status</p>
+                                    <p class="font-semibold text-gray-900 dark:text-white">{{ strtoupper($order->status) }}</p>
                                 </div>
-
-                                <div class="text-right">
+                                <div>
+                                    <p class="text-sm text-gray-500">Payment Method</p>
                                     <p class="font-semibold text-gray-900 dark:text-white">
-                                        Rp {{ number_format($item->subtotal, 0, ',', '.') }}
+                                        {{ $order->payment_method === 'BANK_TRANSFER' ? 'BANK TRANSFER' : 'COD' }}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Total</p>
+                                    <p class="font-semibold text-gray-900 dark:text-white">
+                                        Rp {{ number_format($order->total_amount, 0, ',', '.') }}
                                     </p>
                                 </div>
                             </div>
-                        @endforeach
+
+                            <div class="mt-4">
+                                <p class="text-sm text-gray-500">Shipping Address</p>
+                                <p class="text-gray-900 dark:text-white">{{ $order->shipping_address }}</p>
+                            </div>
+
+                            @if($order->notes)
+                                <div class="mt-4">
+                                    <p class="text-sm text-gray-500">Notes</p>
+                                    <p class="text-gray-900 dark:text-white">{{ $order->notes }}</p>
+                                </div>
+                            @endif
+                        </div>
                     </div>
 
-                    <div class="border-t dark:border-gray-700 pt-4 mt-4">
-                        <div class="flex justify-between text-lg font-bold text-gray-900 dark:text-white">
-                            <span>Total</span>
-                            <span>Rp {{ number_format($order->total_amount, 0, ',', '.') }}</span>
+                    {{-- Items --}}
+                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                        <div class="p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Items</h3>
+
+                            <div class="space-y-4">
+                                @foreach($order->items as $item)
+                                    <div class="flex justify-between border-b pb-3 dark:border-gray-700">
+                                        <div>
+                                            <p class="font-semibold text-gray-900 dark:text-white">{{ $item->product_name }}</p>
+                                            <p class="text-sm text-gray-600 dark:text-gray-400">
+                                                Qty: {{ $item->quantity }} × Rp {{ number_format($item->price, 0, ',', '.') }}
+                                            </p>
+                                        </div>
+                                        <div class="font-semibold text-gray-900 dark:text-white">
+                                            Rp {{ number_format($item->subtotal, 0, ',', '.') }}
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Payment Box --}}
+                <div class="lg:col-span-1">
+                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg sticky top-6">
+                        <div class="p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Payment</h3>
+
+                            @php
+                                $payment = $order->payment;
+                            @endphp
+
+                            @if($payment)
+                                <div class="text-sm text-gray-700 dark:text-gray-300 space-y-2">
+                                    <div class="flex justify-between">
+                                        <span>Status</span>
+                                        <span class="font-semibold">{{ strtoupper($payment->status) }}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Amount</span>
+                                        <span class="font-semibold">Rp {{ number_format($payment->amount, 0, ',', '.') }}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Method</span>
+                                        <span class="font-semibold">{{ $payment->method === 'BANK_TRANSFER' ? 'BANK TRANSFER' : 'COD' }}</span>
+                                    </div>
+
+                                    @if($payment->proof_path)
+                                        <div class="mt-3 p-3 rounded bg-green-50 dark:bg-green-900/20">
+                                            <p class="font-semibold text-green-700 dark:text-green-300">Proof uploaded</p>
+                                            <p class="text-xs text-gray-500">Waiting confirmation</p>
+                                        </div>
+                                    @endif
+                                </div>
+
+                                @if($payment->method === 'BANK_TRANSFER' && $payment->status === 'pending')
+                                    <a href="{{ route('payment.show', $order->id) }}"
+                                       class="block text-center mt-5 bg-blue-500 text-white px-4 py-3 rounded-lg hover:bg-blue-600 transition font-semibold">
+                                        Pay Now
+                                    </a>
+                                @endif
+                            @else
+                                <p class="text-sm text-gray-600 dark:text-gray-400">No payment record.</p>
+                            @endif
+
+                            <a href="{{ route('orders.index') }}" class="block w-full text-center text-gray-600 dark:text-gray-400 mt-4 hover:text-blue-600 transition">
+                                Back to Orders
+                            </a>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {{-- Back Button --}}
-            <div class="flex gap-3">
-                <a href="{{ route('orders.index') }}" class="inline-flex items-center px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                    </svg>
-                    Back to Orders
-                </a>
-
-                <a href="{{ route('shop.index') }}" class="inline-flex items-center px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
-                    Continue Shopping
-                </a>
-            </div>
         </div>
     </div>
 </x-app-layout>

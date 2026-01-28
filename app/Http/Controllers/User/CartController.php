@@ -9,13 +9,16 @@ use Illuminate\Http\Request;
 
 class CartController extends Controller
 {
+    private function assertOwner(Cart $cart): void
+    {
+        abort_if($cart->user_id !== auth()->id(), 403);
+    }
+
     // Tampilkan cart
     public function index()
     {
         $carts = auth()->user()->carts()->with('product')->get();
-        $total = $carts->sum(function ($cart) {
-            return $cart->quantity * $cart->product->price;
-        });
+        $total = $carts->sum(fn ($cart) => $cart->quantity * $cart->product->price);
 
         return view('user.cart.index', compact('carts', 'total'));
     }
@@ -27,27 +30,23 @@ class CartController extends Controller
             'quantity' => 'required|integer|min:1'
         ]);
 
-        // Cek stock
         if ($product->stock < $request->quantity) {
             return back()->with('error', 'Stock not available!');
         }
 
-        // Cek apakah produk sudah ada di cart
         $cart = Cart::where('user_id', auth()->id())
-                    ->where('product_id', $product->id)
-                    ->first();
+            ->where('product_id', $product->id)
+            ->first();
 
         if ($cart) {
-            // Update quantity
             $newQuantity = $cart->quantity + $request->quantity;
-            
+
             if ($product->stock < $newQuantity) {
                 return back()->with('error', 'Stock not available!');
             }
 
             $cart->update(['quantity' => $newQuantity]);
         } else {
-            // Buat cart baru
             Cart::create([
                 'user_id' => auth()->id(),
                 'product_id' => $product->id,
@@ -61,11 +60,14 @@ class CartController extends Controller
     // Update quantity
     public function update(Cart $cart, Request $request)
     {
+        $this->assertOwner($cart);
+
         $request->validate([
             'quantity' => 'required|integer|min:1'
         ]);
 
-        // Cek stock
+        $cart->loadMissing('product');
+
         if ($cart->product->stock < $request->quantity) {
             return back()->with('error', 'Stock not available!');
         }
@@ -78,6 +80,8 @@ class CartController extends Controller
     // Remove from cart
     public function remove(Cart $cart)
     {
+        $this->assertOwner($cart);
+
         $cart->delete();
         return back()->with('success', 'Product removed from cart!');
     }

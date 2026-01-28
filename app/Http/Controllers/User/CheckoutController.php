@@ -5,7 +5,7 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\Cart;
+use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -15,14 +15,12 @@ class CheckoutController extends Controller
     public function index()
     {
         $carts = auth()->user()->carts()->with('product')->get();
-        
+
         if ($carts->isEmpty()) {
             return redirect()->route('shop.index')->with('error', 'Your cart is empty!');
         }
 
-        $total = $carts->sum(function ($cart) {
-            return $cart->quantity * $cart->product->price;
-        });
+        $total = $carts->sum(fn ($cart) => $cart->quantity * $cart->product->price);
 
         return view('user.checkout.index', compact('carts', 'total'));
     }
@@ -32,7 +30,8 @@ class CheckoutController extends Controller
     {
         $request->validate([
             'shipping_address' => 'required|string|max:500',
-            'notes' => 'nullable|string|max:500'
+            'notes' => 'nullable|string|max:500',
+            'payment_method' => 'required|in:COD,BANK_TRANSFER',
         ]);
 
         $carts = auth()->user()->carts()->with('product')->get();
@@ -41,7 +40,6 @@ class CheckoutController extends Controller
             return redirect()->route('shop.index')->with('error', 'Your cart is empty!');
         }
 
-        // Cek stock semua produk
         foreach ($carts as $cart) {
             if ($cart->product->stock < $cart->quantity) {
                 return back()->with('error', "Stock not available for {$cart->product->name}!");
@@ -51,23 +49,18 @@ class CheckoutController extends Controller
         DB::beginTransaction();
 
         try {
-            // Hitung total
-            $total = $carts->sum(function ($cart) {
-                return $cart->quantity * $cart->product->price;
-            });
+            $total = $carts->sum(fn ($cart) => $cart->quantity * $cart->product->price);
 
-            // Buat order
             $order = Order::create([
                 'order_number' => Order::generateOrderNumber(),
                 'user_id' => auth()->id(),
                 'total_amount' => $total,
                 'status' => 'pending',
-                'payment_method' => 'COD',
+                'payment_method' => $request->payment_method,
                 'shipping_address' => $request->shipping_address,
                 'notes' => $request->notes
             ]);
 
-            // Buat order items & kurangi stock
             foreach ($carts as $cart) {
                 OrderItem::create([
                     'order_id' => $order->id,
@@ -78,14 +71,27 @@ class CheckoutController extends Controller
                     'subtotal' => $cart->quantity * $cart->product->price
                 ]);
 
-                // Kurangi stock
                 $cart->product->decrement('stock', $cart->quantity);
             }
+
+            // Create payment record (NEW)
+            Payment::create([
+                'order_id' => $order->id,
+                'method' => $request->payment_method,
+                'status' => 'pending',
+                'amount' => $total,
+            ]);
 
             // Hapus cart
             auth()->user()->carts()->delete();
 
             DB::commit();
+
+            // Redirect tergantung metode
+            if ($request->payment_method === 'BANK_TRANSFER') {
+                return redirect()->route('payment.show', $order->id)
+                    ->with('success', 'Order created! Please complete your payment.');
+            }
 
             return redirect()->route('orders.show', $order->id)->with('success', 'Order created successfully!');
 
@@ -98,19 +104,18 @@ class CheckoutController extends Controller
     // Daftar orders user
     public function orders()
     {
-        $orders = auth()->user()->orders()->with('items.product')->latest()->paginate(10);
+        $orders = auth()->user()->orders()->with('items.product', 'payment')->latest()->paginate(10);
         return view('user.orders.index', compact('orders'));
     }
 
     // Detail order
     public function show(Order $order)
     {
-        // Pastikan order milik user yang login
         if ($order->user_id !== auth()->id()) {
             abort(403);
         }
 
-        $order->load('items.product');
+        $order->load('items.product', 'payment');
         return view('user.orders.show', compact('order'));
     }
 }
