@@ -16,17 +16,34 @@ RUN npm run build
 # =========================
 FROM php:8.2-apache
 
-# Apache: pastikan hanya 1 MPM aktif (untuk mod_php wajib prefork)
+# --- Apache MPM fix (bandel-proof) ---
 RUN set -eux; \
-    a2dismod -f mpm_event mpm_worker mpm_prefork || true; \
-    rm -f /etc/apache2/mods-enabled/mpm_event.load /etc/apache2/mods-enabled/mpm_event.conf \
-          /etc/apache2/mods-enabled/mpm_worker.load /etc/apache2/mods-enabled/mpm_worker.conf \
-          /etc/apache2/mods-enabled/mpm_prefork.load /etc/apache2/mods-enabled/mpm_prefork.conf || true; \
-    a2enmod mpm_prefork; \
-    apache2ctl -M | grep mpm
+  cat > /usr/local/bin/fix-mpm.sh <<'SH' \
+#!/bin/sh
+set -eu
 
+# Matikan semua MPM (paksa)
+a2dismod -f mpm_event mpm_worker mpm_prefork >/dev/null 2>&1 || true
 
-# OS deps + PHP extensions
+# Hapus symlink mods-enabled yang sering bikin dobel
+rm -f /etc/apache2/mods-enabled/mpm_event.* \
+      /etc/apache2/mods-enabled/mpm_worker.* \
+      /etc/apache2/mods-enabled/mpm_prefork.* || true
+
+# Nyalakan prefork doang (wajib untuk mod_php)
+a2enmod mpm_prefork >/dev/null 2>&1 || true
+
+# Enable modul umum yang kamu butuh
+a2enmod rewrite headers >/dev/null 2>&1 || true
+
+# Debug (biar kelihatan kalau masih dobel)
+apache2ctl -M 2>/dev/null | grep mpm || true
+
+exec apache2-foreground
+SH
+  chmod +x /usr/local/bin/fix-mpm.sh
+
+# --- OS deps + PHP extensions ---
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git unzip \
     pkg-config \
@@ -43,7 +60,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       bcmath \
       exif \
       gd \
-  && a2enmod rewrite headers \
   && rm -rf /var/lib/apt/lists/*
 
 # Composer
@@ -72,3 +88,6 @@ RUN php artisan config:cache || true \
  && php artisan view:cache || true
 
 EXPOSE 80
+
+# Jalankan apache lewat script fix MPM
+CMD ["/usr/local/bin/fix-mpm.sh"]
