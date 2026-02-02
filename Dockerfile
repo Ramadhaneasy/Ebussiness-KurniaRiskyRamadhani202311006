@@ -19,7 +19,7 @@ FROM php:8.2-apache
 # OS deps + PHP extensions (pgsql & mysql safe)
 RUN apt-get update && apt-get install -y \
     git unzip libzip-dev libpng-dev libonig-dev libicu-dev \
-  && docker-php-ext-install pdo_mysql pdo_pgsql zip intl \
+  && docker-php-ext-install pdo_mysql zip intl \
   && a2enmod rewrite headers \
   && rm -rf /var/lib/apt/lists/*
 
