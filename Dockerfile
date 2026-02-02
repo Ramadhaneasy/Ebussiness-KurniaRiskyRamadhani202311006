@@ -15,6 +15,8 @@ RUN npm run build
 # 2) PHP + Apache runtime
 # =========================
 FROM php:8.2-apache
+RUN echo "ServerName localhost" > /etc/apache2/conf-available/servername.conf \
+ && a2enconf servername
 
 # --- Apache MPM fix (bandel-proof, SYNTAX BENAR) ---
 RUN set -eux; \
