@@ -16,32 +16,31 @@ RUN npm run build
 # =========================
 FROM php:8.2-apache
 
-# --- Apache MPM fix (bandel-proof) ---
+# --- Apache MPM fix (bandel-proof, SYNTAX BENAR) ---
 RUN set -eux; \
-  cat > /usr/local/bin/fix-mpm.sh <<'SH' \
+  cat > /usr/local/bin/fix-mpm.sh <<'SH'
 #!/bin/sh
 set -eu
 
-# Matikan semua MPM (paksa)
+# Matikan semua MPM
 a2dismod -f mpm_event mpm_worker mpm_prefork >/dev/null 2>&1 || true
 
-# Hapus symlink mods-enabled yang sering bikin dobel
+# Bersihkan symlink bandel
 rm -f /etc/apache2/mods-enabled/mpm_event.* \
       /etc/apache2/mods-enabled/mpm_worker.* \
       /etc/apache2/mods-enabled/mpm_prefork.* || true
 
-# Nyalakan prefork doang (wajib untuk mod_php)
+# Aktifkan prefork saja (wajib mod_php)
 a2enmod mpm_prefork >/dev/null 2>&1 || true
-
-# Enable modul umum yang kamu butuh
 a2enmod rewrite headers >/dev/null 2>&1 || true
 
-# Debug (biar kelihatan kalau masih dobel)
+# Debug (optional)
 apache2ctl -M 2>/dev/null | grep mpm || true
 
 exec apache2-foreground
 SH
-  chmod +x /usr/local/bin/fix-mpm.sh
+RUN chmod +x /usr/local/bin/fix-mpm.sh
+
 
 # --- OS deps + PHP extensions ---
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -67,27 +66,29 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-# Copy app source
+# App source
 COPY . .
 
-# Copy built Vite assets
+# Vite build
 COPY --from=nodebuild /app/public/build /var/www/html/public/build
 
-# Apache docroot -> /public
-RUN sed -i 's#/var/www/html#/var/www/html/public#g' /etc/apache2/sites-available/000-default.conf
+# Apache docroot → /public
+RUN sed -i 's#/var/www/html#/var/www/html/public#g' \
+    /etc/apache2/sites-available/000-default.conf
 
-# Install PHP deps (prod)
+# PHP deps
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Permissions (Laravel)
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+# Laravel permissions
+RUN chown -R www-data:www-data \
+    /var/www/html/storage \
+    /var/www/html/bootstrap/cache
 
-# Optional caches (aman walau env belum lengkap)
+# Optional caches
 RUN php artisan config:cache || true \
  && php artisan route:cache || true \
  && php artisan view:cache || true
 
 EXPOSE 80
 
-# Jalankan apache lewat script fix MPM
 CMD ["/usr/local/bin/fix-mpm.sh"]
