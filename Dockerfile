@@ -23,6 +23,7 @@ RUN a2dismod mpm_event mpm_worker || true \
 # OS deps + PHP extensions
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git unzip \
+    pkg-config \
     libzip-dev \
     libicu-dev \
     libonig-dev \
