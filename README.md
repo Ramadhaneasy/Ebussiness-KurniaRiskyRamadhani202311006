@@ -166,23 +166,24 @@ Proyek ini dibangun menggunakan teknologi modern dari ekosistem Laravel yang sta
 ## ⚙️ Panduan Instalasi
 
 ### 1️⃣ Clone Repository
-```bash
-git clone https://github.com/Ramadhaneasy/Ebussiness-KurniaRiskyRamadhani202311006
+## ⚙️ Panduan Instalasi
 
-### 2️⃣ Install Dependency
+```bash
+# 1. Clone repository
+git clone https://github.com/Ramadhaneasy/Ebussiness-KurniaRiskyRamadhani202311006
+cd Ebussiness-KurniaRiskyRamadhani202311006
+
+# 2. Install dependency
 composer install
 npm install
 
-### 3️⃣ Konfigurasi Environment
+# 3. Konfigurasi environment
 cp .env.example .env
 php artisan key:generate
 
-### 4️⃣ Setup Database
-
-Pastikan database sudah dibuat dan dikonfigurasi di file .env
-
+# 4. Setup database
 php artisan migrate --seed
 
-### 5️⃣ Jalankan Aplikasi
+# 5. Jalankan aplikasi
 npm run dev
 php artisan serve
