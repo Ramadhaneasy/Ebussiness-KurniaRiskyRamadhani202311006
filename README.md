@@ -84,8 +84,8 @@ Sistem marketplace ini memiliki beberapa role pengguna dengan hak akses yang ber
       <br><b>Halaman Login</b>
     </td>
     <td align="center" width="33%">
-      <img src="screenshots/admin_dashboard.png"/>
-      <br><b>Dashboard Admin</b>
+      <img src="screenshots/dashboard_analytic.png"/>
+      <br><b>Dashboard Analytic</b>
     </td>
     <td align="center" width="33%">
       <img src="screenshots/seller_dashboard.png"/>
@@ -143,7 +143,7 @@ Sistem marketplace ini memiliki beberapa role pengguna dengan hak akses yang ber
 
 ---
 
-## 🛠️ Tech Stack & Engine
+## 🛠️ Sellify Stack & Engine
 
 Proyek ini dibangun menggunakan teknologi modern dari ekosistem Laravel yang stabil dan scalable.
 

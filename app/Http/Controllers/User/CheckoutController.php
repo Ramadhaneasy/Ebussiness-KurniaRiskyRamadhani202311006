@@ -8,6 +8,9 @@ use App\Models\OrderItem;
 use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\User;
+use App\Notifications\NewOrderNotification;
+
 
 class CheckoutController extends Controller
 {
@@ -86,6 +89,13 @@ class CheckoutController extends Controller
             auth()->user()->carts()->delete();
 
             DB::commit();
+
+            // Kirim notifikasi ke semua admin
+$admins = User::where('role', 'admin')->get();
+foreach ($admins as $admin) {
+    $admin->notify(new NewOrderNotification($order->load('user')));
+}
+
 
             // Redirect tergantung metode
             if ($request->payment_method === 'BANK_TRANSFER') {

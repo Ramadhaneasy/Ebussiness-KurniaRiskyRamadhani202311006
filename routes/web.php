@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Admin\NotificationController as AdminNotificationController;
 
 Route::view('/', 'welcome');
 
@@ -37,7 +38,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/orders', [CheckoutController::class, 'orders'])->name('orders.index');
     Route::get('/orders/{order}', [CheckoutController::class, 'show'])->name('orders.show');
 
-    // Payment (NEW)
+    // Payment
     Route::get('/payment/{order}', [PaymentController::class, 'show'])->name('payment.show');
     Route::post('/payment/{order}/upload-proof', [PaymentController::class, 'uploadProof'])->name('payment.uploadProof');
 });
@@ -48,6 +49,11 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->as('admin.')-
     Route::resource('users', UserController::class);
     Route::resource('products', ProductController::class);
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+
+    // ✅ Notifications (HARUS DI DALAM GROUP ADMIN)
+    Route::get('/notifications', [AdminNotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/read-all', [AdminNotificationController::class, 'readAll'])->name('notifications.readAll');
+    Route::post('/notifications/{id}/read', [AdminNotificationController::class, 'read'])->name('notifications.read');
 });
 
 // Profile
