@@ -1,4 +1,4 @@
-# 🛍️ Web Marketplace — E-Business Project
+# 🛍️ Sellify — E-Business Project
 
 <div align="center">
 
@@ -8,7 +8,7 @@
 **Mendukung Multi-Role User, Transaksi Digital, dan Manajemen Produk Terintegrasi**
 
 <i>Proyek Mata Kuliah <b>E-Business</b></i>  
-<i>Dikembangkan oleh <b>[Nama Kamu]</b></i>
+<i>Dikembangkan oleh <b>Kurnia Risky Ramadhani</b></i>
 
 <br>
 
@@ -24,7 +24,7 @@
 
 ## 📖 Deskripsi Proyek
 
-**Web Marketplace** adalah aplikasi e-business berbasis web yang dirancang untuk memfasilitasi proses **jual beli online** secara efisien, terstruktur, dan modern.  
+**Sellify** adalah aplikasi e-business berbasis web yang dirancang untuk memfasilitasi proses **jual beli online** secara efisien, terstruktur, dan modern.  
 Sistem ini mendukung **multi-role user**, manajemen produk, transaksi digital, serta dashboard pengelolaan bisnis.
 
 Proyek ini dibuat sebagai implementasi konsep **E-Business**, yang mencakup:
