@@ -16,10 +16,25 @@ RUN npm run build
 # =========================
 FROM php:8.2-apache
 
-# OS deps + PHP extensions (pgsql & mysql safe)
-RUN apt-get update && apt-get install -y \
-    git unzip libzip-dev libpng-dev libonig-dev libicu-dev \
-  && docker-php-ext-install pdo_mysql zip intl \
+# Apache: pastikan hanya 1 MPM aktif (untuk mod_php wajib prefork)
+RUN a2dismod mpm_event mpm_worker || true \
+ && a2enmod mpm_prefork
+
+# OS deps + PHP extensions
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git unzip \
+    libzip-dev \
+    libicu-dev \
+    libpng-dev libjpeg62-turbo-dev libfreetype6-dev \
+  && docker-php-ext-configure gd --with-freetype --with-jpeg \
+  && docker-php-ext-install \
+      pdo_mysql \
+      zip \
+      intl \
+      mbstring \
+      bcmath \
+      exif \
+      gd \
   && a2enmod rewrite headers \
   && rm -rf /var/lib/apt/lists/*
 
@@ -40,7 +55,7 @@ RUN sed -i 's#/var/www/html#/var/www/html/public#g' /etc/apache2/sites-available
 # Install PHP deps (prod)
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Permissions
+# Permissions (Laravel)
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Optional caches (aman walau env belum lengkap)
