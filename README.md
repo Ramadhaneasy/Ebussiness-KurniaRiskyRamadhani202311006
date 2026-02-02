@@ -167,5 +167,22 @@ Proyek ini dibangun menggunakan teknologi modern dari ekosistem Laravel yang sta
 
 ### 1️⃣ Clone Repository
 ```bash
-git clone https://github.com/username/marketplace-ebusiness.git
-cd marketplace-ebusiness
+git clone https://github.com/Ramadhaneasy/Ebussiness-KurniaRiskyRamadhani202311006
+
+### 2️⃣ Install Dependency
+composer install
+npm install
+
+### 3️⃣ Konfigurasi Environment
+cp .env.example .env
+php artisan key:generate
+
+### 4️⃣ Setup Database
+
+Pastikan database sudah dibuat dan dikonfigurasi di file .env
+
+php artisan migrate --seed
+
+### 5️⃣ Jalankan Aplikasi
+npm run dev
+php artisan serve
