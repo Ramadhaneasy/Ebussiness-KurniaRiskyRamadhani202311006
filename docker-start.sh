@@ -58,5 +58,8 @@ else
   echo "!! manifest.json NOT FOUND -> @vite() pasti 404"
 fi
 
+rm -f /var/www/html/public/hot || true
+
+
 echo "==> Starting Apache..."
 exec apache2-foreground
