@@ -39,3 +39,7 @@ php artisan migrate --force || true
 
 echo "==> Starting Apache..."
 exec apache2-foreground
+
+echo "=== CHECK BUILD OUTPUT ==="
+ls -lah public/build || true
+ls -lah public/build/assets || true
