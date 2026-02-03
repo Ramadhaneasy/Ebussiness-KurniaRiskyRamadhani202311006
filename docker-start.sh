@@ -29,9 +29,10 @@ chmod -R 775 $APP_DIR/storage $APP_DIR/bootstrap/cache
 php artisan optimize:clear || true
 
 # 6) Cache ulang config/route/view (optional tapi bikin cepat)
-php artisan config:cache || true
-php artisan route:cache || true
-php artisan view:cache || true
+php artisan config:clear || true
+php artisan route:clear || true
+php artisan view:clear || true
+php artisan cache:clear || true
 
 # 7) Jalankan migrate otomatis (aman kalau sqlite sudah ada)
 php artisan migrate --force || true
