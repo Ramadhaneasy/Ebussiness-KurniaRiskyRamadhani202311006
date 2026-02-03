@@ -1,44 +1,62 @@
-# ====== Build assets (Vite) ======
-FROM node:20-alpine AS nodebuild
+# Stage 1: Build assets
+FROM node:20 AS asset-builder
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 COPY . .
 RUN npm run build
 
-# ====== PHP runtime ======
-FROM php:8.3-apache
+# Stage 2: Final image
+FROM php:8.2-apache
 
-# System deps
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    git unzip libzip-dev libpng-dev libonig-dev libicu-dev \
-  && docker-php-ext-install pdo_mysql zip intl \
-  && a2enmod rewrite headers \
-  && rm -rf /var/lib/apt/lists/*
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libzip-dev \
+    libsqlite3-dev \
+    zip \
+    unzip \
+    git \
+    curl \
+    libonig-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) gd \
+    && docker-php-ext-install pdo_mysql pdo_sqlite mbstring zip exif pcntl
 
-# Composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# Enable Apache mod_rewrite and update DocumentRoot to /public
+RUN a2enmod rewrite
+ENV APACHE_DOCUMENT_ROOT /var/www/html/public
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# Set working directory
 WORKDIR /var/www/html
 
-# Copy app
+# Copy composer files and install PHP dependencies
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --optimize-autoloader --no-scripts
+
+# Copy the rest of the application
 COPY . .
 
-# Copy built assets
-COPY --from=nodebuild /app/public/build /var/www/html/public/build
+# Run composer scripts now that 'artisan' is available
+RUN composer run-script post-autoload-dump
 
-# Apache docroot -> /public
-RUN sed -i 's#/var/www/html#/var/www/html/public#g' /etc/apache2/sites-available/000-default.conf
+# Copy built assets from Stage 1
+COPY --from=asset-builder /app/public/build ./public/build
 
-# Permissions (storage & cache)
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+# Set permissions for storage and cache
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Install PHP deps (no dev)
-RUN composer install --no-dev --optimize-autoloader --no-interaction
-
-# Laravel optimize (opsional)
-RUN php artisan config:cache || true \
- && php artisan route:cache || true \
- && php artisan view:cache || true
-
+# Expose port
 EXPOSE 80
+
+# Use startup script
+RUN chmod +x /var/www/html/docker-start.sh
+CMD ["/var/www/html/docker-start.sh"]
