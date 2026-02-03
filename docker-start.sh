@@ -1,14 +1,40 @@
 #!/usr/bin/env bash
 set -e
 
-# clear cache biar gak kejebak config lama
+APP_DIR="/var/www/html"
+
+echo "==> Booting Laravel on Render..."
+
+# 1) Pastikan folder storage lengkap (ini yang bikin error kamu: sessions/views/cache gak ada)
+mkdir -p $APP_DIR/storage/framework/{cache,data,sessions,views}
+mkdir -p $APP_DIR/storage/logs
+mkdir -p $APP_DIR/bootstrap/cache
+
+# 2) (Optional) bikin folder khusus sqlite biar rapi
+mkdir -p $APP_DIR/storage/database
+
+# 3) Kalau DB sqlite belum ada, buat file sqlite-nya
+if [ "$DB_CONNECTION" = "sqlite" ]; then
+  if [ ! -f "$APP_DIR/storage/database/database.sqlite" ]; then
+    echo "==> Creating SQLite database file..."
+    touch $APP_DIR/storage/database/database.sqlite
+  fi
+fi
+
+# 4) Permission biar Apache bisa nulis session/cache/view/sqlite
+chown -R www-data:www-data $APP_DIR/storage $APP_DIR/bootstrap/cache
+chmod -R 775 $APP_DIR/storage $APP_DIR/bootstrap/cache
+
+# 5) Bersihkan cache supaya ENV Render yang baru kebaca
 php artisan optimize:clear || true
 
-# buat sqlite file (Render free: /tmp itu writable)
-touch /tmp/database.sqlite
+# 6) Cache ulang config/route/view (optional tapi bikin cepat)
+php artisan config:cache || true
+php artisan route:cache || true
+php artisan view:cache || true
 
-# migrate (kalau belum ada tabel)
+# 7) Jalankan migrate otomatis (aman kalau sqlite sudah ada)
 php artisan migrate --force || true
 
-# start apache
+echo "==> Starting Apache..."
 exec apache2-foreground
